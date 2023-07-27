@@ -8,6 +8,8 @@ News
 {% block content %}
    <h1>Все публикации</h1>
 
+   <p>Количество новостей: {{ post|length }}</p>
+
    <hr>
    {% if post %}
        <table align='center'>
@@ -32,6 +34,13 @@ News
 
    {% endif %}
 {% endblock content %}
+
+
+
+
+
+
+
 
 
 
