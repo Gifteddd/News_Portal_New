@@ -7,7 +7,7 @@ Post
 
 {% block content %}
    <h1>{{ post.title|censor }}</h1>
-   <p>{{ post.content|censor|truncatechars:20 }}</p>
+   <p>{{ post.content|censor }}</p>
    <h2>{{ post.created_at|date:'d M Y' }}</h2>
 {% endblock content %}
 
