@@ -1,0 +1,40 @@
+<!--{% extends 'flatpages/default.html' %}-->
+<!--{% load custom_filters %}-->
+
+<!--{% block title %}-->
+<!--postt-->
+<!--{% endblock title %}-->
+
+<!--{% block content %}-->
+<!--   <h1>Все публикации</h1>-->
+<!--   <h2>Всего статей: {{ news_count }}</h2>-->
+<!--   <h3>{{ time_now|date:'M d Y' }}</h3>-->
+
+<!--   <hr>-->
+<!--   {% if news %}-->
+<!--       <table align='center'>-->
+<!--           <tr>-->
+<!--                <td>Заголовок</td>-->
+<!--                <td>Дата публикации</td>-->
+<!--                <td>Текст</td>-->
+<!--                <td>Категория</td>-->
+<!--                <td>Рейтинг</td>-->
+<!--           </tr>-->
+<!--           {% for item in news %}-->
+<!--           <tr>-->
+<!--               <td>{{ item.title|censor }}</td>-->
+<!--               <td>{{ item.created_at }}</td>-->
+<!--               <td>{{ item.content|truncatewords:20 }}</td>-->
+<!--               <td>{{ item.category }}</td>-->
+<!--               <td>{{ item.rating|currency }}</td>-->
+<!--           </tr>-->
+<!--           {% endfor %}-->
+<!--       </table>-->
+<!--   {% else %}-->
+<!--       <h2>Товаров нет!</h2>-->
+<!--   {% endif %}-->
+<!--{% endblock content %}-->
+<p>hello_world</p>
+
+
+
