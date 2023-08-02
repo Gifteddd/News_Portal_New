@@ -1,44 +1,38 @@
 {% extends 'flatpages/default.html' %}
+
 {% load custom_filters %}
 
-{% block title %}
-News
-{% endblock title %}
-
 {% block content %}
-   <h1>Все публикации</h1>
+    <h2>Список новостей</h2>
+<hr />
+    <ul>
+        {% for post in postt %}
+            <h3>{{ post.title|censor }}</h3>
+            <p>{{ post.created_at|date:"d.m.Y" }}</p>
+            <p>{{ post.content|censor|slice:":20" }} {{"..."}}</p>
+            <a href="{% url 'post:post_detail' post.id %}">Читать далее</a>
+        {% endfor %}
+    </ul>
+<hr />
+    {% if page_obj.has_previous %}
+    <!-- Для каждой ссылки пагинации указываем обработку через новый тег -->
+        <a href="?page=1">&laquo; 1</a>
+        {% if page_obj.previous_page_number != 1 %}
+            ...
+            <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+        {% endif %}
+    {% endif %}
 
-   <p>Количество новостей: {{ post|length }}</p>
+    {{ page_obj.number }}
 
-   <hr>
-   {% if post %}
-       <table align='center'>
-           <tr>
-               <th>Заголовок</th>
-               <th>Дата публикации</th>
-               <th>Текст</th>
-               <th>Рейтинг</th>
-           </tr>
-           {% for item in post %}
-           <tr>
-               <td>{{ item.title|censor }}</td>
-               <td>{{ item.created_at|date:'d M Y' }}</td>
-               <td>{{ item.content|truncatechars:20|censor }}</td>
-               <td>{{ item.rating }}</td>
-           </tr>
-           {% endfor %}
-       </table>
-
-   {% else %}
-       <h2>Товаров нет!</h2>
-
-   {% endif %}
-{% endblock content %}
-
-
-
-
-
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    {% endif %}
+{% endblock %}
 
 
 

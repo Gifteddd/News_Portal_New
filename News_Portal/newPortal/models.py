@@ -21,10 +21,12 @@ class Author(models.Model):  # Определяем модель Author, нас�
         self.ratingAuthor = pRat * 3 + cRat  # Расчет обновленного рейтинга автора
         self.save()  # Сохранение изменений
 
+    def __str__(self):
+        return self.user.username
+
 
 class Category(models.Model):  # Определяем модель Category, наследуясь от models.Model
     name = models.CharField(max_length=255, unique=True)  # Поле name типа CharField с максимальной длиной 255 символов и уникальным значением
-    subscribers = models.ManyToManyField(User, related_name='categories')
 
     def __str__(self):
         return f'{self.name}'
@@ -39,7 +41,7 @@ class Post(models.Model):  # Определяем модель Post, насле�
         (post, 'Статья')
     ]
     author = models.ForeignKey(Author,on_delete=models.CASCADE)  # Поле author типа ForeignKey, связанное с моделью Author
-    post_type = models.CharField(max_length=10, choices=POST_TYPES)  # Поле post_type типа CharField с максимальной длиной 10 символов и выбором из POST_TYPES
+    post_type = models.CharField(max_length=10, choices=POST_TYPES, default=news)  # Поле post_type типа CharField с максимальной длиной 10 символов и выбором из POST_TYPES
     created_at = models.DateTimeField(auto_now_add=True)  # Поле created_at типа DateTimeField с автоматическим добавлением текущей даты и времени при создании
     categories = models.ManyToManyField(Category, through='PostCategory')  # Связь "многие ко многим" с моделью Category через модель PostCategory
     title = models.CharField(max_length=255)  # Поле title типа CharField с максимальной длиной 255 символов
@@ -59,6 +61,9 @@ class Post(models.Model):  # Определяем модель Post, насле�
 
     def __str__(self):
         return f'{self.title}: {self.content}'
+
+    def get_absolute_url(self):
+        return reverse('post:post_detail', args=[str(self.id)])
 
 
 class PostCategory(models.Model):  # Определяем модель PostCategory, наследуясь от models.Model
@@ -81,3 +86,5 @@ class Comment(models.Model):  # Определяем модель Comment, на�
         self.rating -= 1  # Уменьшаем значение рейтинга на 1
         self.save()  # Сохранение изменений
 
+    def __str__(self):
+        return self.text
