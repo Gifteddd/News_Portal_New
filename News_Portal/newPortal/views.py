@@ -19,7 +19,7 @@ def upgrade_user(request):
     group = Group.objects.get(name='authors')
     if not user.groups.filter(name='authors').exists():
         group.user_set.add(user)
-        Author.objects.create(authorUser=user)
+        Author.objects.create(user=user)
     return redirect('post:post_list')
 
 
@@ -47,11 +47,6 @@ class PostList(ListView):
         # чтобы потом добавить в контекст и использовать в шаблоне.
         # Возвращаем из функции отфильтрованный список товаров
         return queryset.order_by('-created_at')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_author'] = self.request.user.groups.filter(name='authors').exists()
-        return context
 
     # Метод get_context_data позволяет нам изменить набор данных,
     # который будет передан в шаблон.

@@ -42,21 +42,21 @@
         </button>
     {% endif %}
 
-    <!-- Добавленный блок кода -->
     {% if perms.newPortal.add_post %}
-    <a href="{% url 'post:post_create' %}">Добавить товар</a>
-{% endif %}
+        <a href="{% url 'post:post_create' %}">Добавить товар</a>
+    {% endif %}
 
-    {# Условие получается составным. #}
     {% if perms.newPortal.change_post or perms.newPortal.delete_post %}
         <td>Действия</td>
     {% endif %}
 
-    {% if perms.Portal.change_post %}
-        <td><a href="{% url 'post_update' pk=post.id %}">Изменить</a></td>
-    {% endif %}
-    {% if perms.Portal.delete_post %}
-        <td><a href="{% url 'post_delete' post.id %}">Удалить</a></td>
+    {% if postt %}
+        {% if perms.newPortal.change_post %}
+            <td><a href="{% url 'post:post_edit' postt.0.pk %}">Изменить</a></td>
+        {% endif %}
+        {% if perms.newPortal.delete_post %}
+            <td><a href="{% url 'post:post_delete' postt.0.pk %}">Удалить</a></td>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
