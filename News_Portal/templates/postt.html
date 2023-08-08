@@ -4,7 +4,7 @@
 
 {% block content %}
     <h2>Список новостей</h2>
-<hr />
+    <hr />
     <ul>
         {% for post in postt %}
             <h3>{{ post.title|censor }}</h3>
@@ -13,9 +13,10 @@
             <a href="{% url 'post:post_detail' post.id %}">Читать далее</a>
         {% endfor %}
     </ul>
-<hr />
+    <hr />
+
     {% if page_obj.has_previous %}
-    <!-- Для каждой ссылки пагинации указываем обработку через новый тег -->
+        <!-- Для каждой ссылки пагинации указываем обработку через новый тег -->
         <a href="?page=1">&laquo; 1</a>
         {% if page_obj.previous_page_number != 1 %}
             ...
@@ -32,10 +33,31 @@
             <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
         {% endif %}
     {% endif %}
+
+    {% if not is_author %}
+        <button>
+            <a class="nav-link" href="{% url 'post:account_upgrade' %}">
+                <h4><strong>Стать автором!</strong></h4>
+            </a>
+        </button>
+    {% endif %}
+
+    <!-- Добавленный блок кода -->
+    {% if perms.newPortal.add_post %}
+    <a href="{% url 'post:post_create' %}">Добавить товар</a>
+{% endif %}
+
+    {# Условие получается составным. #}
+    {% if perms.newPortal.change_post or perms.newPortal.delete_post %}
+        <td>Действия</td>
+    {% endif %}
+
+    {% if perms.Portal.change_post %}
+        <td><a href="{% url 'post_update' pk=post.id %}">Изменить</a></td>
+    {% endif %}
+    {% if perms.Portal.delete_post %}
+        <td><a href="{% url 'post_delete' post.id %}">Удалить</a></td>
+    {% endif %}
 {% endblock %}
-
-
-
-
 
 

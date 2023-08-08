@@ -3,9 +3,17 @@
 {% block content %}
 <h1>Создать новость</h1>
 <hr>
-  <form method="post">
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Создать</button>
-  </form>
+</form>
+
+{% if not is_author %}
+    <button>
+        <a class="nav-link" href="{% url 'account_upgrade' %}">
+            <h4><strong>Стать автором!</strong></h4>
+        </a>
+    </button>
+{% endif %}
 {% endblock %}

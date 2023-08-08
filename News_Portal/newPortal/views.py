@@ -7,6 +7,20 @@ from .forms import PostForm, ArticleForm
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.contrib.auth.models import Group
+
+
+@login_required
+def upgrade_user(request):
+    user = request.user
+    group = Group.objects.get(name='authors')
+    if not user.groups.filter(name='authors').exists():
+        group.user_set.add(user)
+        Author.objects.create(authorUser=user)
+    return redirect('post:post_list')
 
 
 class PostList(ListView):
@@ -34,6 +48,11 @@ class PostList(ListView):
         # Возвращаем из функции отфильтрованный список товаров
         return queryset.order_by('-created_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = self.request.user.groups.filter(name='authors').exists()
+        return context
+
     # Метод get_context_data позволяет нам изменить набор данных,
     # который будет передан в шаблон.
     # def get_context_data(self, **kwargs):
@@ -60,7 +79,8 @@ class PostDetail(DetailView):
     context_object_name = 'post'
 
 
-class PostCreate(CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('newPortal.add_post',)
     model = Post
     form_class = PostForm
     template_name = 'post_create.html'
@@ -73,15 +93,22 @@ class PostCreate(CreateView):
         post.save()
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = self.request.user.groups.filter(name='authors').exists()
+        return context
 
-class PostEdit(UpdateView):
+
+class PostEdit(PermissionRequiredMixin, UpdateView):
+    permission_required = ('newPortal.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
     success_url = reverse_lazy('post:post_list')
 
 
-class PostDelete(DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('newPortal.delete_post',)
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post:post_list')
@@ -101,28 +128,37 @@ def article_detail(request, post_id):
     return render(request, 'article_detail.html', {'post': post})
 
 
-class ArticleCreate(CreateView):
+class ArticleCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('newPortal.add_post',)
     model = Post
     form_class = ArticleForm
     template_name = 'article_create.html'
     success_url = reverse_lazy('post:article_list')
 
     def form_valid(self, form):
-        new_post = form.save(commit=False)
-        new_post.post_type = 'post'
-        new_post.author = self.request.user.author
-        new_post.save()
+        post = form.save(commit=False)
+        post.post_type = 'news'
+        post.author = self.request.user.author
+        post.save()
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['is_author'] = user.groups.filter(name='authors').exists()
+        return context
 
-class ArticleEdit(UpdateView):
+
+class ArticleEdit(PermissionRequiredMixin, UpdateView):
+    permission_required = ('newPortal.change_post',)
     model = Post
     form_class = ArticleForm
     template_name = 'article_edit.html'
     success_url = reverse_lazy('post:article_list')
 
 
-class ArticleDelete(DeleteView):
+class ArticleDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('newPortal.delete_post',)
     model = Post
     template_name = 'article_delete.html'
     success_url = reverse_lazy('post:article_list')
