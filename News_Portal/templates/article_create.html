@@ -8,4 +8,12 @@
     {{ form.as_p }}
     <button type="submit">Создать</button>
   </form>
+
+{% if not is_author %}
+    <button>
+        <a class="nav-link" href="{% url 'post:account_upgrade' %}">
+            <h4><strong>Стать автором!</strong></h4>
+        </a>
+    </button>
+{% endif %}
 {% endblock %}
