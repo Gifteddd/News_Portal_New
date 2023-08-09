@@ -25,6 +25,6 @@ class SignUpForm(UserCreationForm):
 class CustomSignupForm(SignupForm):
     def save(self, request):  # выполняется при успешном заполнении формы регистрации.
         user = super().save(request)
-        authors= Group.objects.get(name="Authors")  # получаем объект модели группы с названием common users
+        authors= Group.objects.get(name="authors")  # получаем объект модели группы с названием common users
         user.groups.add(authors)  # добавляем нового пользователя в эту группу
         return user

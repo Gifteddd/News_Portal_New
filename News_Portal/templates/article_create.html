@@ -1,19 +1,11 @@
 {% extends 'flatpages/default.html' %}
 
 {% block content %}
-<h1>Статья</h1>
+<h1>Создать статью</h1>
 <hr>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Создать</button>
   </form>
-
-{% if not is_author %}
-    <button>
-        <a class="nav-link" href="{% url 'post:account_upgrade' %}">
-            <h4><strong>Стать автором!</strong></h4>
-        </a>
-    </button>
-{% endif %}
 {% endblock %}

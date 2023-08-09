@@ -48,6 +48,11 @@ class PostList(ListView):
         # Возвращаем из функции отфильтрованный список товаров
         return queryset.order_by('-created_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = self.request.user.groups.filter(name='authors').exists()
+        return context
+
     # Метод get_context_data позволяет нам изменить набор данных,
     # который будет передан в шаблон.
     # def get_context_data(self, **kwargs):
@@ -87,11 +92,6 @@ class PostCreate(PermissionRequiredMixin, CreateView):
         post.author = self.request.user.author
         post.save()
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_author'] = self.request.user.groups.filter(name='authors').exists()
-        return context
 
 
 class PostEdit(PermissionRequiredMixin, UpdateView):
@@ -136,12 +136,6 @@ class ArticleCreate(PermissionRequiredMixin, CreateView):
         post.author = self.request.user.author
         post.save()
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        context['is_author'] = user.groups.filter(name='authors').exists()
-        return context
 
 
 class ArticleEdit(PermissionRequiredMixin, UpdateView):
