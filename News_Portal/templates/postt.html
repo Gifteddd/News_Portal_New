@@ -3,13 +3,13 @@
 {% load custom_filters %}
 
 {% block content %}
-    <button>
-        <a class="nav-link" href="{% url 'post:account_upgrade' %}">
+    <button class="btn btn-primary">
+        <a class="nav-link text-white" href="{% url 'post:account_upgrade' %}">
             <h4><strong>Стать автором!</strong></h4>
         </a>
     </button>
 
-    <h2>Список новостей</h2>
+    <h2 class="mt-4">Список новостей</h2>
     <hr />
 
     {% for post in postt %}
@@ -18,26 +18,33 @@
             <p>{{ post.created_at|date:"d.m.Y" }}</p>
             <p>{{ post.content|censor }}</p>
             <a href="{% url 'post:post_detail' post.id %}">Читать далее</a>
+
+            <!-- Добавляем блок для вывода ссылок на категории -->
+            <p>
+                {% for categories in post.categories.all %}
+                    <a href="{% url 'post:category_list' categories.id %}">{{ categories }}</a>
+                {% endfor %}
+            </p>
         </div>
         <hr />
     {% endfor %}
 
     {% if page_obj.has_previous %}
         <!-- Для каждой ссылки пагинации указываем обработку через новый тег -->
-        <a href="?page=1">&laquo; 1</a>
+        <a href="?page=1" class="btn btn-link">&laquo; 1</a>
         {% if page_obj.previous_page_number != 1 %}
             ...
-            <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-link">{{ page_obj.previous_page_number }}</a>
         {% endif %}
     {% endif %}
 
-    {{ page_obj.number }}
+    <span class="btn btn-link">{{ page_obj.number }}</span>
 
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-link">{{ page_obj.next_page_number }}</a>
         {% if paginator.num_pages != page_obj.next_page_number %}
             ...
-            <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-link">{{ page_obj.paginator.num_pages }}</a>
         {% endif %}
     {% endif %}
 {% endblock %}

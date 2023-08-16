@@ -172,3 +172,44 @@ class Search(ListView):
         return context
 
 
+class CategoryListView(ListView):
+    model = Post
+    template_name = 'category_list.html'
+    context_object_name = 'category_posts_list'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.kwargs['pk'])
+        queryset = Post.objects.filter(categories=self.category).order_by('-created_at')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+
+        if self.request.user not in self.category.subscribers.all():
+            context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        else:
+            context['is_subscriber'] = self.request.user in self.category.subscribers.all()
+
+        context['category'] = self.category
+        return context
+
+
+@login_required
+def subscribe(request, pk):
+    user = request.user
+    categories = Category.objects.get(id=pk)
+    categories.subscribers.add(user)
+
+    message = 'Оформлена подписка на категорию '
+    return render(request, 'subscribe.html', {'categories': categories, 'message': message})
+
+
+@login_required
+def unsubscribe(request, pk):
+    user = request.user
+    categories = Category.objects.get(id=pk)
+    categories.subscribers.remove(user)
+
+    message = 'Отменена подписка новостей и статьей на категорию'
+    return render(request, 'subscribe.html', {'categories': categories, 'message': message})

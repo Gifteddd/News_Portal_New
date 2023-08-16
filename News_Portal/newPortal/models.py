@@ -27,6 +27,7 @@ class Author(models.Model):  # Определяем модель Author, нас�
 
 class Category(models.Model):  # Определяем модель Category, наследуясь от models.Model
     name = models.CharField(max_length=255, unique=True)  # Поле name типа CharField с максимальной длиной 255 символов и уникальным значением
+    subscribers = models.ManyToManyField(User, related_name='categories')
 
     def __str__(self):
         return f'{self.name}'
@@ -88,3 +89,5 @@ class Comment(models.Model):  # Определяем модель Comment, на�
 
     def __str__(self):
         return self.text
+
+

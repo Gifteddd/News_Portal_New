@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 # Импортируем созданное нами представление
-from .views import PostList, PostDetail, PostCreate, PostEdit, PostDelete, Search, ArticleCreate, ArticleDelete, ArticleEdit, upgrade_user
+from .views import PostList, PostDetail, PostCreate, PostEdit, PostDelete, Search, ArticleCreate, ArticleDelete, ArticleEdit, upgrade_user, CategoryListView, subscribe, unsubscribe
 
 app_name = 'post'
 
@@ -28,6 +28,9 @@ urlpatterns = [
    path('articles/create/', ArticleCreate.as_view(), name='articles_create'),  # шаблон для создания статьи
    path('articles/<int:pk>/edit/', ArticleEdit.as_view(), name='article_edit'),  # шаблон для редактирования статьи
    path('articles/<int:pk>/delete/', ArticleDelete.as_view(), name='article_delete'),  # шаблон для удаления статьи
-   path('upgrade/', upgrade_user, name='account_upgrade')
+   path('upgrade/', upgrade_user, name='account_upgrade'),
+   path('categories/<int:pk>', CategoryListView.as_view(), name='category_list'),
+   path('categories/<int:pk>/subscribe', subscribe, name='subscribe'),
+   path('categories/<int:pk>/unsubscribe', unsubscribe, name='unsubscribe'),
 ]
 
