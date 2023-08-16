@@ -3,48 +3,48 @@
 {% load custom_filters %}
 
 {% block content %}
-    <button class="btn btn-primary">
-        <a class="nav-link text-white" href="{% url 'post:account_upgrade' %}">
+    <div class="author-button">
+        <a class="nav-link" href="{% url 'post:account_upgrade' %}">
             <h4><strong>Стать автором!</strong></h4>
         </a>
-    </button>
+    </div>
 
-    <h2 class="mt-4">Список новостей</h2>
-    <hr />
+    <h2 class="news-heading">Список новостей</h2>
+    <hr class="divider" />
 
     {% for post in postt %}
         <div class="news-item">
-            <h3>{{ post.title|censor }}</h3>
-            <p>{{ post.created_at|date:"d.m.Y" }}</p>
-            <p>{{ post.content|censor }}</p>
-            <a href="{% url 'post:post_detail' post.id %}">Читать далее</a>
+            <h3 class="news-title">{{ post.title|censor }}</h3>
+            <p class="news-date">{{ post.created_at|date:"d.m.Y" }}</p>
+            <p class="news-content">{{ post.content|censor }}</p>
+            <a class="read-more" href="{% url 'post:post_detail' post.id %}">Читать далее</a>
 
-            <!-- Добавляем блок для вывода ссылок на категории -->
-            <p>
-                {% for categories in post.categories.all %}
-                    <a href="{% url 'post:category_list' categories.id %}">{{ categories }}</a>
+            <p class="news-categories">
+                {% for category in post.categories.all %}
+                    <a class="category-link" href="{% url 'post:category_list' category.id %}">{{ category }}</a>
                 {% endfor %}
             </p>
         </div>
-        <hr />
+        <hr class="divider" />
     {% endfor %}
 
-    {% if page_obj.has_previous %}
-        <!-- Для каждой ссылки пагинации указываем обработку через новый тег -->
-        <a href="?page=1" class="btn btn-link">&laquo; 1</a>
-        {% if page_obj.previous_page_number != 1 %}
-            ...
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-link">{{ page_obj.previous_page_number }}</a>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-link">&laquo; 1</a>
+            {% if page_obj.previous_page_number != 1 %}
+                ...
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
         {% endif %}
-    {% endif %}
 
-    <span class="btn btn-link">{{ page_obj.number }}</span>
+        <span class="current-page">{{ page_obj.number }}</span>
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-link">{{ page_obj.next_page_number }}</a>
-        {% if paginator.num_pages != page_obj.next_page_number %}
-            ...
-            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-link">{{ page_obj.paginator.num_pages }}</a>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">{{ page_obj.next_page_number }}</a>
+            {% if paginator.num_pages != page_obj.next_page_number %}
+                ...
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">{{ page_obj.paginator.num_pages }}</a>
+            {% endif %}
         {% endif %}
-    {% endif %}
+    </div>
 {% endblock %}
