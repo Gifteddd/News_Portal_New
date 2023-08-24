@@ -2,49 +2,80 @@
 
 {% load custom_filters %}
 
+{% load custom_tags %}
+
+{% block title %}
+Post
+{% endblock title %}
+
 {% block content %}
-    <div class="author-button">
-        <a class="nav-link" href="{% url 'post:account_upgrade' %}">
-            <h4><strong>Стать автором!</strong></h4>
-        </a>
-    </div>
+    <h1>Breaking News</h1>
+    <h3>{{ time_now|date:'d M Y' }}</h3>
+    <h3>{{ next_post|default_if_none:'Следите за обновлениями на нашем сайте!' }}</h3>
+    <h5> Количество публикаций на этой странице: </h5>
+    <h4>{{ post|length }}</h4>
+    <form align="left"></form>
+    <form action="" method="get">
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Найти" />
+    </form>
+    <hr>
+    {% if perms.post.add_post %}
+    <p><strong><em><a href="{% url 'post_create' %}">Добавить новость или статью</a></em></strong></p><hr>
+    {% endif %}
 
-    <h2 class="news-heading">Список новостей</h2>
-    <hr class="divider" />
+    {% if post %}
+        <table align="center">
+            <tr>
+                <td><span style="text-decoration: underline;"><strong>Автор</strong></span></td>
+                <td><span style="text-decoration: underline;"><strong>Заголовок</strong></span></td>
+                <td><span style="text-decoration: underline;"><strong>Дата публикации</strong></span></td>
+                <td><span style="text-decoration: underline;"><strong>Текст</strong></span></td>
+                <td><span style="text-decoration: underline;"><strong>Категория</strong></span></td>
+                <td><span style="text-decoration: underline;"><strong>Рейтинг</strong></span></td>
+                {% if perms.post.update_post or perms.post.delete_post %}
+                <td><span style="text-decoration: underline;"><strong>Действия</strong></span></td>
+                {% endif %}
+            </tr>
+            {% for post in post %}
+            <tr>
+                <td>{{ post.author }} </td>
+                <td>{{ post.title|truncatewords:4|censor }}</td>
+                <td>{{ post.created_at|date:'d M Y' }} </td>
+                <td><p><em><a href="{{ link }}{{ post.get_absolute_url }}">{{ post.text|truncatewords:20|censor }}</a></em></p><hr> </td>
+                <td>
+                    {% for cat in post.postCategory.all %}
+                        {{ cat.name }}
+                    {% endfor %}
+                </td>
+                <td>{{ post.rating }} </td>
+                <td>
+                    {% if perms.post.update_post %}
+                    <p><em><a href="{% url 'post_update' pk=post.id %}">Изменить</a></em></p>
+                    {% endif %}
+                    {% if perms.post.delete_post %}
+                    <p><em><a href="{% url 'post_delete' pk=post.id %}">Удалить</a></em></p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>Новостей нет!</h2>
+    {% endif %}
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
 
-    {% for post in postt %}
-        <div class="news-item">
-            <h3 class="news-title">{{ post.title|censor }}</h3>
-            <p class="news-date">{{ post.created_at|date:"d.m.Y" }}</p>
-            <p class="news-content">{{ post.content|censor }}</p>
-            <a class="read-more" href="{% url 'post:post_detail' post.id %}">Читать далее</a>
+   {{ page_obj.number }}
 
-            <p class="news-categories">
-                {% for category in post.categories.all %}
-                    <a class="category-link" href="{% url 'post:category_list' category.id %}">{{ category }}</a>
-                {% endfor %}
-            </p>
-        </div>
-        <hr class="divider" />
-    {% endfor %}
-
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a href="?page=1" class="page-link">&laquo; 1</a>
-            {% if page_obj.previous_page_number != 1 %}
-                ...
-                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">{{ page_obj.previous_page_number }}</a>
-            {% endif %}
-        {% endif %}
-
-        <span class="current-page">{{ page_obj.number }}</span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="page-link">{{ page_obj.next_page_number }}</a>
-            {% if paginator.num_pages != page_obj.next_page_number %}
-                ...
-                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">{{ page_obj.paginator.num_pages }}</a>
-            {% endif %}
-        {% endif %}
-    </div>
-{% endblock %}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}
