@@ -12,6 +12,7 @@ from django.db.models import Exists, OuterRef
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
 from .tasks import *
+from django.core.cache import cache
 
 
 @login_required
@@ -38,7 +39,7 @@ class PostList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['time_now'] = datetime.utcnow()
+        context['time_now'] = datetime.datetime.utcnow()
         context['next_post'] = None
         context['filterset'] = self.filterset
         return context
@@ -48,6 +49,15 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'posts'
+    queryset = Post.objects.all()
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+            return obj
 
 
 class PostCreate(PermissionRequiredMixin, CreateView):

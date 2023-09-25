@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-vv=hlq+$#*a_sv(&09tg$u3(^hqoi70rh%7hz5fqbm3w87svd)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -179,3 +179,118 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'),
+    }
+}
+
+LOGGING = {
+    'version': 1,  # указывает версию конфигурации
+    'disable_existing_loggers': False,  # ставим False, для работы логгеров
+    'loggers': {
+        'django': {
+            # тут показывает куда будут направляться записи логгов
+            'handlers': ['console', 'warning', 'error_critical', 'general_log'],
+            # уровень DEBUG и выше
+            'level': 'DEBUG',
+            # указывает,следует ли отправлять логгер в родительским логгерам
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['errors_log', 'admin_mail'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['errors_log', 'admin_mail'],
+            'propagate': True,
+        },
+        'django.template': {
+            'handlers': ['errors_log'],
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['errors_log'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['security_log'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'filters': ['require_debug_true']
+        },
+        'warning': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'warning',
+            'filters': ['require_debug_true']
+        },
+        'error_critical': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'error_critical',
+            'filters': ['require_debug_true']
+        },
+        'general_log': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'general',
+            'filters': ['require_debug_false']
+        },
+        'errors_log': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'error_critical',
+            'filters': ['require_debug_false']
+        },
+        'security_log': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'general',
+            'filters': ['require_debug_false']
+        },
+        'admin_mail': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'error_critical',
+            'filters': ['require_debug_false']
+        }
+    },
+    'style': '{',
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        },
+        'warning': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s'
+        },
+        'error_critical': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s %(exc_info)s'
+        },
+        'general': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(module)s'
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue'
+        },
+    }
+}
